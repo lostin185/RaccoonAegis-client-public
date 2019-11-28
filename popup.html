@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    body {
+      min-width: 300px;
+      font-size: 15px;
+    }
+
+    input {
+      margin: 5px;
+      outline: none;
+    }
+  </style>
+  <meta charset="utf8" />
+</head>
+
+<body>
+  <h2>너굴맨 등장!</h2>
+  <p>원하는 단어는 너굴맨이 다 처리할테니 걱정말라구!</p>
+  <ul id="displayWords"></ul>
+  <form id="form">
+    <div>
+      <label for="loginId">아이디</label>
+      <input type="email" id="loginId" placeholder="ID">
+      <div><label for="loginPw">비밀번호</label>
+        <input type="password" id="loginPw" placeholder="Password">
+      </div>
+    </div>
+    <button type="submit" disabled="disabled">로그인</button>
+    <div>
+      <div><label for="badSentence">기분 나쁜 문장을 입력하라구!</label>
+        <input type="text" id="badSentence" placeholder="이 바보야!">
+        <button type="submit" id="badInput">입력</button>
+      </div>
+      <input type="checkbox" id="keepLogin">
+      <label for="keepLogin"><span>로그인 상태 유지</span></label>
+    </div>
+    <input type="text" id="userWords" />
+    <br />
+    <input type="submit" value="Submit" id="wordSubmit" />
+    <button id="clearList">Clear</button>
+  </form>
+</body>
+<script src="popup.js"></script>
+
+</html>
