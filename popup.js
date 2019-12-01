@@ -210,7 +210,8 @@ function changePage() {
       div1.innerText="너굴맨! 이 단어들을 막아줘!"
       let addCussInput = document.createElement('input');
       addCussInput.setAttribute('size', '10')
-      addCussInput.style.paddingLeft="15px"
+      addCussInput.setAttribute('id', 'userWords')
+      addCussInput.style.marginLeft="15px"
       div1.appendChild(addCussInput);
       let addCussButton = document.createElement('button');
       addCussButton.setAttribute('type', 'button')
@@ -227,20 +228,29 @@ function changePage() {
       div2.style.width="90px"
       div2.style.height="75px";
       let ulList = document.createElement('ul');
+      div2.appendChild(ulList);
       ulList.style.paddingTop="5px";
       ulList.style.margin="0px";
-      ulList.style.paddingLeft="30px"
-      let wordList = ['바보', '거지', '멍청이', '말미잘']
-      for (let i = 0; i < 2; i++) {
-        let liList = document.createElement('li');
-        liList.innerText = wordList[i];
-        ulList.appendChild(liList);
-      }
-      div2.appendChild(ulList);
-      let leftover = document.createElement('div')
-      leftover.innerText=`그 외 ${wordList.length - 2}개`
-      leftover.style.paddingLeft='15px'
-      div2.appendChild(leftover)
+
+      chrome.storage.local.get(['words'], object => {
+        let userWords = object.words
+        if (userWords) {
+          ulList.style.paddingLeft="30px"
+          for (let i = userWords.length - 1; i > userWords.length - 3; i--) {
+            let listItem = document.createElement('li');
+            listItem.innerText = userWords[i];
+            ulList.appendChild(listItem);
+          }  
+          let leftover = document.createElement('div')
+          leftover.innerText=`그 외 ${userWords.length - 2}개`
+          leftover.style.paddingLeft='15px'
+          div2.appendChild(leftover)
+        } else {
+          ulList.style.padding = "0px";
+          ulList.style.textAlign = "center"
+          ulList.innerText = '표시할\n단어가\n없습니다.'
+        }
+      })
 
       let div3 = document.createElement('div')
       layout.appendChild(div3);
@@ -271,11 +281,12 @@ function changePage() {
       div4.innerText="○◎ 너굴AI가 정상적으로 작동합니다 ◎○"
       div4.style.textAlign="center"
       let addCussSentence = document.createElement('input');
-      addCussSentence.setAttribute('size', '10')
+      addCussSentence.setAttribute('size', '20')
       addCussSentence.style.paddingLeft="15px"
       div4.appendChild(addCussSentence);
       let addCussLearning = document.createElement('button');
       addCussLearning.setAttribute('type', 'button')
+      addCussLearning.setAttribute('id', 'badSentence')
       addCussLearning.innerText="AI가르치기"
       div4.appendChild(addCussLearning);
 
@@ -297,12 +308,12 @@ function changePage() {
         const userWords = document.getElementById('userWords').value.trim();
         chrome.storage.local.get(['words'], object => {
           const newWords = object.words || [];
-          newWords.push(userWords);
+          if (userWords !== "") {
+            newWords.push(userWords);
+          }
           chrome.storage.local.set({ words: newWords });
         });
-        chrome.tabs.executeScript(null, {
-          file: "content_script.js"
-        });
+
         execut();
       };
 
@@ -316,23 +327,6 @@ function changePage() {
 }
 
 changePage();
-
-
-// function displayWords() {
-//   chrome.storage.local.get(['words'], object => {
-//     const pageList = document.getElementById('displayWords');
-//     if (object.words) {
-//       const searchWords = object.words;
-//       for (let i = 0; i < searchWords.length; i += 1) {
-//         const listItem = document.createElement('li');
-//         listItem.innerText = searchWords[i];
-//         pageList.appendChild(listItem);
-//       }
-//     }
-//   });
-// }
-
-// displayWords();
 
 const execut = () => {
   // executeScript를 여러번 실행시키기 위해 함수 작성.
