@@ -3,34 +3,92 @@
 
 <head>
   <style>
-    body {
-      min-width: 300px;
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .raccoon_says {
+      padding: 8px 5px;
       font-size: 15px;
+      text-align: center;
+    }
+
+    .input_place1 {
+      padding-left: 22px
+    }
+
+    .input_place2 {
+      padding-left: 9px
+    }
+
+    img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 0px;
+      margin-bottom: 0px;
+      padding: 0px;
+    }
+
+    body {
+      width: 300px;
+      height: 320px;
+      background-color: #e6e6e6;
+      font-size: 15px;
+      overflow: auto;
     }
 
     input {
-      margin: 5px;
+      margin: 4px;
       outline: none;
     }
+
+    form {
+      border-style: solid;
+      border-width: 1px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      margin: 0px;
+    }
+
+    #signin_button {
+      margin-left: 1px;
+    }
+
+    #send_info {
+      margin-left: 4px;
+    }
+
   </style>
   <meta charset="utf8" />
 </head>
 
 <body>
-  <h2>너굴맨 등장!</h2>
-  <p>원하는 단어는 너굴맨이 다 처리할테니 걱정말라구!</p>
+  <div class="title">☆★☆너굴맨 등장!☆★☆</div>
+  <div class="raccoon_says">못된 악플들은 내가 다 처리했으니 걱정말라구!</div>
+  <!-- <div> -->
+    <img src="raccoon2.jpg" width=100% alt="Tada! Raccon-Man!">
+  <!-- </div> -->
   <ul id="displayWords"></ul>
   <form id="form">
-    <div>
-      <label for="loginId">아이디</label>
-      <input type="email" id="loginId" placeholder="ID">
-      <div><label for="loginPw">비밀번호</label>
-        <input type="password" id="loginPw" placeholder="Password">
-      </div>
+    <div class="input_place1">
+      <label for="loginId">아이디:</label>
+      <input size="15" type="email" id="loginId" placeholder="id@email.com">
+      <button type="button" id="signin_button">로그인</button>
     </div>
-    <button type="submit" disabled="disabled">로그인</button>
-    <div>
-      <div><label for="badSentence">기분 나쁜 문장을 입력하라구!</label>
+    <div class="input_place2">
+      <label for="loginPw">비밀번호:</label>
+      <input size="15" type="password" id="loginPw" placeholder="password">
+      <!-- <button type="submit" disabled="disabled">회원가입</button> -->
+      <button type="button" id="signup_button">회원가입</button>
+    </div>
+    <!-- </div> -->
+    <!-- <button type="submit" disabled="disabled">로그인</button> -->
+    <!-- <div>
+      <div>
+        <label for="badSentence">기분 나쁜 문장을 입력하라구!</label>
         <input type="text" id="badSentence" placeholder="이 바보야!">
         <button type="submit" id="badInput">입력</button>
       </div>
@@ -40,8 +98,10 @@
     <input type="text" id="userWords" />
     <br />
     <input type="submit" value="Submit" id="wordSubmit" />
-    <button id="clearList">Clear</button>
+    <button id="clearList">Clear</button> -->
   </form>
+
+
 </body>
 <script src="popup.js"></script>
 
