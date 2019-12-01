@@ -232,25 +232,38 @@ function changePage() {
       ulList.style.paddingTop="5px";
       ulList.style.margin="0px";
 
-      chrome.storage.local.get(['words'], object => {
-        let userWords = object.words
-        if (userWords) {
-          ulList.style.paddingLeft="30px"
-          for (let i = userWords.length - 1; i > userWords.length - 3; i--) {
-            let listItem = document.createElement('li');
-            listItem.innerText = userWords[i];
-            ulList.appendChild(listItem);
-          }  
-          let leftover = document.createElement('div')
-          leftover.innerText=`그 외 ${userWords.length - 2}개`
-          leftover.style.paddingLeft='15px'
-          div2.appendChild(leftover)
-        } else {
-          ulList.style.padding = "0px";
-          ulList.style.textAlign = "center"
-          ulList.innerText = '표시할\n단어가\n없습니다.'
-        }
-      })
+      function displayWords() {
+        chrome.storage.local.get(['words'], object => {
+          let userWords = object.words
+          if (userWords) {
+            ulList.style.paddingLeft="30px"
+            if (userWords.length > 1) {
+              for (let i = userWords.length - 1; i > userWords.length - 3; i--) {
+                let listItem = document.createElement('li');
+                listItem.innerText = userWords[i];
+                ulList.appendChild(listItem);
+              }  
+            } else {
+              for (let i = userWords.length - 1; i > -1; i--) {
+                let listItem = document.createElement('li');
+                listItem.innerText = userWords[i];
+                ulList.appendChild(listItem);
+              }
+            }
+            let leftover = document.createElement('div')
+            if (userWords.length > 2) {
+              leftover.innerText=`그 외 ${userWords.length - 2}개`
+              leftover.style.paddingLeft='15px'
+              div2.appendChild(leftover)
+            }
+          } else {
+            ulList.style.padding = "0px";
+            ulList.style.textAlign = "center"
+            ulList.innerText = '표시할\n단어가\n없습니다.'
+          }
+        })
+      }
+      displayWords();
 
       let div3 = document.createElement('div')
       layout.appendChild(div3);
@@ -310,15 +323,18 @@ function changePage() {
           const newWords = object.words || [];
           if (userWords !== "") {
             newWords.push(userWords);
+            chrome.storage.local.set({ words: newWords });
+            document.getElementsByClassName('main')[0].removeChild(formNode)
+            changePage();
+            execut();
           }
-          chrome.storage.local.set({ words: newWords });
         });
-
-        execut();
       };
 
       initButton.onclick = () => {
         chrome.storage.local.clear();
+        document.getElementsByClassName('main')[0].removeChild(formNode)
+        changePage();
         execut();
       };      
     
