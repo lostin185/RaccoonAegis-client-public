@@ -1,18 +1,10 @@
-let status = {
-  signinPage: true,
-  signupPage: false,
-  memberPage: false
-}
+let serverUrl = '';
 
 function changePage() {
-
-  if (status.signinPage) {
-
-    let response = 200
-
-    if (response === 200) {
+  chrome.storage.local.get(['status'], result => {
+    if (result.status.signinPage) {
       document.getElementsByClassName('raccoon_says')[0].innerText = "못된 악플들은 내가 다 처리했으니 걱정말라구!"
-
+  
       let formNode = document.createElement('form');
       document.getElementsByClassName('main')[0].appendChild(formNode);
       
@@ -24,7 +16,7 @@ function changePage() {
       layout.style.width="298px";
       layout.style.height="62px";
       formNode.appendChild(layout);
-
+  
       let div1 = document.createElement('div');
       div1.style.borderStyle="solid";
       div1.style.borderWidth="1px";
@@ -32,7 +24,7 @@ function changePage() {
       div1.style.margin="0px";
       div1.style.width="278px";
       div1.style.padding="2px 10px";
-
+  
       let div2 = document.createElement('div');
       div2.style.borderStyle="solid";
       div2.style.borderWidth="1px";
@@ -40,10 +32,10 @@ function changePage() {
       div2.style.margin="0px";
       div2.style.width="278px";
       div2.style.padding="2px 10px";
-
+  
       layout.appendChild(div1)
       layout.appendChild(div2)
-
+  
       let idLabel = document.createElement('label');
       idLabel.setAttribute('for', 'signinId');
       idLabel.innerText = '아이디:'
@@ -62,48 +54,66 @@ function changePage() {
       div1.appendChild(idLabel);
       div1.appendChild(idInput);
       div1.appendChild(signupButton)
-
+  
       let pwLabel = document.createElement('label');
-      pwLabel.setAttribute('for', 'signinId');
+      pwLabel.setAttribute('for', 'signinPw');
       pwLabel.innerText = '비밀번호:'
       let pwInput = document.createElement('input');
       pwInput.setAttribute('size', '15')
-      pwInput.setAttribute('type', 'email')
-      pwInput.setAttribute('id', 'signinId')
+      pwInput.setAttribute('type', 'password')
+      pwInput.setAttribute('id', 'signinPw')
       pwInput.setAttribute('placeholder', 'your password')
       pwInput.style.marginLeft = "5px";
       pwInput.style.marginRight = "5px";
       let signinButton = document.createElement('button')
       signinButton.innerText = '로그인'
-      signinButton.setAttribute('id', 'signup')
+      signinButton.setAttribute('id', 'signin')
       signinButton.setAttribute('type', 'button')
       div2.appendChild(pwLabel);
       div2.appendChild(pwInput);
       div2.appendChild(signinButton);
-
+  
       signupButton.onclick = () => {
+        
         document.getElementsByClassName('main')[0].removeChild(formNode)
-        status.signinPage = false;
-        status.signupPage = true;
+        chrome.storage.local.set({status: {signinPage: false, signupPage: true, memberPage: false}})
         changePage();
       }
-
+  
       signinButton.onclick = () => {
-        document.getElementsByClassName('main')[0].removeChild(formNode)
-        status.signinPage = false;
-        status.memberPage = true;
-        changePage();
+        const mail = document.getElementById('signinId').value;
+        const pw = document.getElementById('signinPw').value;
+        const data = {};
+        data.mail = mail;
+        data.pw = pw;
+  
+        fetch(serverUrl + '/signin', {
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-cache',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+          .then(response => {
+            if (response.status === 200) {
+              document.getElementsByClassName('main')[0].removeChild(formNode)
+              chrome.storage.local.set({status: {signinPage: false, signupPage: false, memberPage: true}})
+              changePage();
+            } else {
+              alert('에러가 발생하여 로그인되지 않았습니다.')
+            }
+          })
       }
     }
-  }
+  })
 
-  if (status.signupPage) {
 
-    let response = 200
-
-    if (response === 200) {
+  chrome.storage.local.get(['status'], result => {
+    if (result.status.signupPage) {
       document.getElementsByClassName('raccoon_says')[0].innerText = "너! 내 동료가 되라구!";
-
+  
       let formNode = document.createElement('form');
       document.getElementsByClassName('main')[0].appendChild(formNode);
       
@@ -115,7 +125,7 @@ function changePage() {
       layout.style.width="298px";
       layout.style.height="62px";
       formNode.appendChild(layout);
-
+  
       let div1 = document.createElement('div');
       div1.style.borderStyle="solid";
       div1.style.borderWidth="1px";
@@ -123,7 +133,7 @@ function changePage() {
       div1.style.margin="0px";
       div1.style.width="278px";
       div1.style.padding="3px 10px";
-
+  
       let div2 = document.createElement('div');
       div2.style.borderStyle="solid";
       div2.style.borderWidth="1px";
@@ -131,31 +141,31 @@ function changePage() {
       div2.style.margin="0px";
       div2.style.width="278px";
       div2.style.padding="2px 10px";
-
+  
       layout.appendChild(div1)
       layout.appendChild(div2)
-
+  
       let idLabel = document.createElement('label');
-      idLabel.setAttribute('for', 'signinId');
+      idLabel.setAttribute('for', 'signupId');
       idLabel.innerText = '아이디:'
       idLabel.style.marginLeft = '14px';
       let idInput = document.createElement('input');
       idInput.setAttribute('size', '15')
       idInput.setAttribute('type', 'email')
-      idInput.setAttribute('id', 'signinId')
+      idInput.setAttribute('id', 'signupId')
       idInput.setAttribute('placeholder', 'id@email.com')
       idInput.style.marginLeft = "5px";
       idInput.style.marginRight = "5px";
       div1.appendChild(idLabel);
       div1.appendChild(idInput);
-
+  
       let pwLabel = document.createElement('label');
-      pwLabel.setAttribute('for', 'signinId');
+      pwLabel.setAttribute('for', 'signupPw');
       pwLabel.innerText = '비밀번호:'
       let pwInput = document.createElement('input');
       pwInput.setAttribute('size', '15')
       pwInput.setAttribute('type', 'email')
-      pwInput.setAttribute('id', 'signinId')
+      pwInput.setAttribute('id', 'signupPw')
       pwInput.setAttribute('placeholder', 'your password')
       pwInput.style.marginLeft = "5px";
       pwInput.style.marginRight = "5px";
@@ -166,28 +176,47 @@ function changePage() {
       div2.appendChild(pwLabel);
       div2.appendChild(pwInput);
       div2.appendChild(signupButton);  
-
+  
       signupButton.onclick = () => {
-        document.getElementsByClassName('main')[0].removeChild(formNode)
-        status.signupPage = false;
-        status.signinPage = true;
-        changePage();
+  
+        const mail = document.getElementById('signupId').value;
+        const pw = document.getElementById('signupPw').value;
+        const data = {};
+        data.mail = mail;
+        data.pw = pw;
+  
+        fetch(serverUrl + '/signup', {
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-cache',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+          .then(response => {
+            if (response.status === 200) {
+              alert('회원가입에 성공하였습니다.')
+              document.getElementsByClassName('main')[0].removeChild(formNode)
+              chrome.storage.local.set({status: {signupPage: false, signinPage: true, memberPage: false}})
+              changePage();
+            } else if (response.status === 300) {
+              alert('중복된 아이디입니다.')
+            } else {
+              alert('에러가 발생하여 가입되지 않았습니다.')
+            }
+          })
       }
+    }  
+  })
 
-    }
-  }
-
-
-  if (status.memberPage) {
-
-    let response = 200
-
-    if (response === 200) {
+  chrome.storage.local.get(['status'], result => {
+    if (result.status.memberPage) {
       document.getElementsByClassName('raccoon_says')[0].innerText = "(아이디!) 너는 내가 특별히 더 지켜주겠다구!"
-
+  
       let formNode = document.createElement('form');
       document.getElementsByClassName('main')[0].appendChild(formNode)
-
+  
       let layout = document.createElement('div')
       formNode.appendChild(layout);
       layout.style.borderStyle="solid"
@@ -197,7 +226,7 @@ function changePage() {
       layout.style.width="298px";
       layout.style.height="130px"
       formNode.appendChild(layout)
-
+  
       let div1 = document.createElement('div')
       layout.appendChild(div1);
       div1.style.borderStyle="solid"
@@ -217,7 +246,7 @@ function changePage() {
       addCussButton.setAttribute('type', 'button')
       addCussButton.innerText="추가!"
       div1.appendChild(addCussButton);
-
+  
       let div2 = document.createElement('div')
       layout.appendChild(div2);
       div2.style.borderStyle="solid"
@@ -231,40 +260,53 @@ function changePage() {
       div2.appendChild(ulList);
       ulList.style.paddingTop="5px";
       ulList.style.margin="0px";
-
+  
       function displayWords() {
-        chrome.storage.local.get(['words'], object => {
-          let userWords = object.words
-          if (userWords) {
-            ulList.style.paddingLeft="30px"
-            if (userWords.length > 1) {
-              for (let i = userWords.length - 1; i > userWords.length - 3; i--) {
-                let listItem = document.createElement('li');
-                listItem.innerText = userWords[i];
-                ulList.appendChild(listItem);
-              }  
+  
+        fetch(serverUrl + '/inputWord')
+          .then(response => {
+            if (response.status === 200) {
+              return response.json()
             } else {
-              for (let i = userWords.length - 1; i > -1; i--) {
-                let listItem = document.createElement('li');
-                listItem.innerText = userWords[i];
-                ulList.appendChild(listItem);
+              throw '에러로 인해 단어를 가져오지 못했습니다.'
+            }
+          })
+          .catch(err => {
+            alert(err);
+          })
+          .then(json => {
+            let userWords = json.words;
+            if (userWords.length === 0) {
+              ulList.style.paddingLeft="30px"
+              if (userWords.length > 1) {
+                for (let i = userWords.length - 1; i > userWords.length - 3; i--) {
+                  let listItem = document.createElement('li');
+                  listItem.innerText = userWords[i];
+                  ulList.appendChild(listItem);
+                }  
+              } else {
+                for (let i = userWords.length - 1; i > -1; i--) {
+                  let listItem = document.createElement('li');
+                  listItem.innerText = userWords[i];
+                  ulList.appendChild(listItem);
+                }
               }
+              let leftover = document.createElement('div')
+              if (userWords.length > 2) {
+                leftover.innerText=`그 외 ${userWords.length - 2}개`
+                leftover.style.paddingLeft='15px'
+                div2.appendChild(leftover)
+              }
+            } else {
+              ulList.style.padding = "0px";
+              ulList.style.textAlign = "center"
+              ulList.innerText = '표시할\n단어가\n없습니다.'
             }
-            let leftover = document.createElement('div')
-            if (userWords.length > 2) {
-              leftover.innerText=`그 외 ${userWords.length - 2}개`
-              leftover.style.paddingLeft='15px'
-              div2.appendChild(leftover)
-            }
-          } else {
-            ulList.style.padding = "0px";
-            ulList.style.textAlign = "center"
-            ulList.innerText = '표시할\n단어가\n없습니다.'
-          }
-        })
+  
+          })
       }
       displayWords();
-
+  
       let div3 = document.createElement('div')
       layout.appendChild(div3);
       div3.style.borderStyle="solid"
@@ -281,7 +323,7 @@ function changePage() {
       initButton.innerText="초기화"
       initButton.setAttribute('type', 'button')
       div3.appendChild(initButton)
-
+  
       let div4 = document.createElement('div')
       layout.appendChild(div4);
       div4.style.borderStyle="solid"
@@ -302,10 +344,12 @@ function changePage() {
       addCussLearning.setAttribute('id', 'badSentence')
       addCussLearning.innerText="AI가르치기"
       div4.appendChild(addCussLearning);
-
+  
       addCussLearning.onclick = () => {
-        const userWords = document.getElementById('badSentence').value.trim();
-        fetch('http://127.0.0.1:5000/', {
+        const userSentence = document.getElementById('badSentence').value.trim();
+        const data = {};
+        data.sentence = userSentence;
+        fetch(serverUrl + '/sendSentence', {
           method: 'POST', // *GET, POST, PUT, DELETE, etc.
           mode: 'cors', // no-cors, cors, *same-origin
           cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -313,33 +357,60 @@ function changePage() {
             'Content-Type': 'application/json'
             // 'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: JSON.stringify(userWords) // body data type must match "Content-Type" header
-        }).then(response => console.log(response.json())); // parses JSON response into native JavaScript objects
+          body: JSON.stringify(data) // body data type must match "Content-Type" header
+        })
+          .then(response => {
+            if (response.status === 200) {
+              alert('정상적으로 전송되었습니다.');
+            } else {
+              alert('에러가 발생하여 전송되지 않았습니다.')
+            }
+          }); // parses JSON response into native JavaScript objects
       };
-     
+      
       addCussButton.onclick = () => {
         const userWords = document.getElementById('userWords').value.trim();
-        chrome.storage.local.get(['words'], object => {
-          const newWords = object.words || [];
-          if (userWords !== "") {
-            newWords.push(userWords);
-            chrome.storage.local.set({ words: newWords });
-            document.getElementsByClassName('main')[0].removeChild(formNode)
-            changePage();
-            execut();
-          }
-        });
+        const data = {};
+        data.inputWord = userWords;
+        fetch(serverUrl + '/inputWord', {
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-cache',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+          .then(response => {
+            if (response.status === 200) {
+              alert('정상적으로 전송되었습니다.')
+            } else {
+              alert('에러가 발생하여 전송되지 않았습니다.')
+            }
+          })
       };
-
+  
       initButton.onclick = () => {
-        chrome.storage.local.clear();
-        document.getElementsByClassName('main')[0].removeChild(formNode)
-        changePage();
-        execut();
-      };      
-    
-    }
-  }
+        fetch(serverUrl + '/inputWord', {
+          method: 'DELETE',
+          mode: 'cors',
+          cache: 'no-cache',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        })
+          .then(response => {
+            if (response.status === 200) {
+              document.getElementsByClassName('main')[0].removeChild(formNode)
+              changePage();
+              execut();            
+            } else {
+              alert('에러가 발생하여 삭제되지 않았습니다.')
+            }
+          })   
+      }    
+    }  
+  })
 }
 
 changePage();

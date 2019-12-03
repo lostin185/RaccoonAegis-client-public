@@ -1,36 +1,95 @@
-chrome.storage.local.get(["words"], function (object) {
-  let regExp = new RegExp("(" + object.words.join("|") + ")");
-  let word = object.words;
-  console.log(word); // 배열의 형태로 출력.
-  const kSets = [
-    { selectors: "p, span" },
-    { selectors: "li, td" },
-    { selectors: "h1, h2, h3, th" }
-  ];
+let serverUrl = ""
 
-  function replaceAll(str, searchStr, replaceStr) {
-    // 첫 단어만 변경하는 replace 대신 replaceAll 함수 작성.
-    return str.split(searchStr).join(replaceStr);
+chrome.storage.local.get(['status'], result => {
+  if (result.status.memberPage) {
+    dataUrl = chrome.runtime.getURL('./data.json')
+  
+    fetch(dataUrl)
+      .then(response => response.json())
+      .then(json => json.words)
+      .then(localWords => {
+        fetch(serverUrl + '/inputWord')
+          .then(response => {
+            if (response.status === 200) {
+              return response.json()
+            }
+          })
+          .then(json => json.words)
+          .then(serverWords => {
+            return serverWords.concat(localWords);
+          })
+          .then(fullWords => {
+            let regExp = new RegExp("(" + fullWords.join("|") + ")");      
+
+            const sets = "p, span, li, td, h1, h2, h3, th";
+
+            function replaceAll(str, searchStr, replaceStr) {
+              return str.split(searchStr).join(replaceStr);
+            }
+
+            let data = { text: [] };
+            let elements = Array.from(document.querySelectorAll(sets))
+            
+            for (let element of elements) {
+              data.text.push(element.innerText)
+            }
+
+            fetch(serverUrl + 'usemodel', {
+              method: 'POST',
+              mode: 'cors',
+              cache: 'no-cache',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(data)
+            })
+              .then(response => response.json())
+              .then(json => {
+                let probability = json.body.prob;
+                for (let i = 0; i < probability.length; i++) {
+                  if (probability[i] > 0.5) {  ////////////////////////////////////50% 이상일 경우
+                    elements[i].innerText = "이 문장은 너굴맨이 처리했다구!"
+                  }
+                }
+              })
+              .then(() => {
+                for (element of elements) {
+                  for (let i = 0; i < fullWords.length; i++) {
+                    if (regExp.test(element.innerText)) {
+                      element.innerText = replaceAll(element.innerText, fullWords[i], "***");
+                    }
+                  }              
+                }
+              })
+          })
+      })
   }
+})
 
-  for (let set of kSets) {
-    let elements = Array.from(document.querySelectorAll(set.selectors));
-    for (let element of elements) {
-      // 삼중 for문을 작성. 추후 수정 요망.
-      for (let i = 0; i < word.length; i++) {
-        if (regExp.test(element.innerText)) {
-          element.innerText = replaceAll(element.innerText, word[i], "***");
+
+chrome.storage.local.get(['status'], result => {
+  if (!result.status.memberPage) {
+  const dataPlace = chrome.runtime.getURL('./data.json')
+  
+  fetch(dataPlace)
+    .then(response => response.json())
+    .then(givenJson => {
+      let fullWords = givenJson.words;
+      let regExp = new RegExp("(" + words.join("|") + ")");
+      const sets = "p, span, li, td, h1, h2, h3, th";
+  
+      function replaceAll(str, searchStr, replaceStr) {
+        return str.split(searchStr).join(replaceStr);
+      }
+  
+      let elements = Array.from(document.querySelectorAll(sets));
+      for (let element of elements) {
+        for (let i = 0; i < fullWords.length; i++) {
+          if (regExp.test(element.innerText)) {
+            element.innerText = replaceAll(element.innerText, fullWords[i], "***");
+          }
         }
       }
-    }
+    })
   }
-});
-
-// 각 문장의 첫번째 해당 단어만 변환되는 문제. -> 해결 후 다른 문제. (해당 단어 변환 후 몇몇 링크가 없어짐)
-// 페이지를 새로고침 하거나 새로운 페이지를 띄울 때 첫번째 해당 단어만 변환되거나 그마저도 변환되지 않는 문제. -> 해결.
-// submit으로 해당 단어 등록 후 바로 변환되지 않는 문제. -> 해결.
-// clear 버튼 클릭 후 바로 변환 되지 않는 문제.
-// 링크나 특정 엘리먼트 안의 해당 단어가 변환되지 않는 문제. -> 엘리먼트 추가 필요.
-// submit을 누를 때 content_script가 실행? -> 실행 되는 것으로 파악.
-// 비동기 문제인지 다른 문제인지? -> 아닌 것으로 추측, 추후 회의를 거칠 예정.
-// 실행 후 오류 발생.
+})

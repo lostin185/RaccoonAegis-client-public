@@ -12,3 +12,11 @@ chrome.runtime.onInstalled.addListener(function () {
     chrome.declarativeContent.onPageChanged.addRules([kMatchRule]);
   });
 });
+
+chrome.storage.local.set({
+  status: {
+    signinPage: true,
+    signupPage: false,
+    memberPage: false
+  }
+})
