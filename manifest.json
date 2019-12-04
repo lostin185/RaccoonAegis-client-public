@@ -20,7 +20,7 @@
   },
   "content_scripts": [
     {
-      "all_frames": true,
+      "all_frames": false,
       "js": [
         "content_script.js"
       ],
@@ -29,5 +29,8 @@
       ],
       "run_at": "document_idle"
     }
+  ],
+  "web_accessible_resources": [
+    "data.json"
   ]
 }
