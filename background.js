@@ -1,7 +1,7 @@
 const kMatchRule = {
   conditions: [
     new chrome.declarativeContent.PageStateMatcher({
-      pageUrl: { hostEquals: "<all_urls>" }
+      pageUrl: { hostEquals: "<all_urls>", schemes: ['http', 'https'] }
     })
   ],
   actions: [new chrome.declarativeContent.ShowPageAction()]
@@ -52,3 +52,7 @@ chrome.runtime.onMessage.addListener(
       return true;
     }
   });
+
+  chrome.storage.onChanged.addListener(() => {
+    console.log('status changed')
+  })

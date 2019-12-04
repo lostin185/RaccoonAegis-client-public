@@ -73,10 +73,7 @@ function changePage() {
       div2.appendChild(pwInput);
       div2.appendChild(signinButton);
   
-      execut();
-
-      signupButton.onclick = () => {
-        
+      signupButton.onclick = () => {        
         document.getElementsByClassName('main')[0].removeChild(formNode)
         chrome.storage.local.set({status: {signinPage: false, signupPage: true, memberPage: false}})
         changePage();
@@ -103,7 +100,6 @@ function changePage() {
               document.getElementsByClassName('main')[0].removeChild(formNode)
               chrome.storage.local.set({status: {signinPage: false, signupPage: false, memberPage: true}})
               changePage();
-              execut();
             } else {
               alert('에러가 발생하여 로그인되지 않았습니다.')
             }
@@ -111,7 +107,6 @@ function changePage() {
       }
     }
   })
-
 
   chrome.storage.local.get(['status'], result => {
     if (result.status.signupPage) {
@@ -181,7 +176,6 @@ function changePage() {
       div2.appendChild(signupButton);  
   
       signupButton.onclick = () => {
-  
         const mail = document.getElementById('signupId').value;
         const pw = document.getElementById('signupPw').value;
         const data = {};
@@ -270,7 +264,7 @@ function changePage() {
             if (response.status === 200) {
               return response.json()
             } else {
-              return console.error();
+              alert('에러로 인해 단어를 표시할 수 없습니다.')
             }
           })
           .catch(err => {
@@ -347,7 +341,6 @@ function changePage() {
       addCussLearning.innerText="AI가르치기"
       div4.appendChild(addCussLearning);
   
-
       let div5 = document.createElement('div')
       layout.appendChild(div5);
       div5.style.borderStyle="solid"
@@ -363,21 +356,18 @@ function changePage() {
       signout.innerText="로그아웃"
       div5.appendChild(signout);
 
-      execut();
-
       addCussLearning.onclick = () => {
         const userSentence = document.getElementById('badSentence').value.trim();
         const data = {};
         data.sentence = userSentence;
         fetch(serverUrl + 'sendSentence', {
-          method: 'POST', // *GET, POST, PUT, DELETE, etc.
-          mode: 'cors', // no-cors, cors, *same-origin
-          cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-cache',
           headers: {
             'Content-Type': 'application/json'
-            // 'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: JSON.stringify(data) // body data type must match "Content-Type" header
+          body: JSON.stringify(data)
         })
           .then(response => {
             if (response.status === 200) {
@@ -385,9 +375,9 @@ function changePage() {
             } else {
               alert('에러가 발생하여 전송되지 않았습니다.')
             }
-          }); // parses JSON response into native JavaScript objects
+          });
       };
-      
+
       addCussButton.onclick = () => {
         const userWords = document.getElementById('userWords').value.trim();
         const data = {};
@@ -406,13 +396,12 @@ function changePage() {
               alert('정상적으로 추가되었습니다.')
               document.getElementsByClassName('main')[0].removeChild(formNode)
               changePage();
-              execut();
             } else {
               alert('에러가 발생하여 추가되지 않았습니다.')
             }
           })
       };
-  
+
       initButton.onclick = () => {
         fetch(serverUrl + 'inputWord', {
           method: 'DELETE',
@@ -425,8 +414,7 @@ function changePage() {
           .then(response => {
             if (response.status === 200) {
               document.getElementsByClassName('main')[0].removeChild(formNode)
-              changePage();
-              execut();            
+              changePage();           
             } else {
               alert('에러가 발생하여 삭제되지 않았습니다.')
             }
@@ -440,46 +428,21 @@ function changePage() {
               document.getElementsByClassName('main')[0].removeChild(formNode)
               chrome.storage.local.set({status: {signinPage: true, signupPage: false, memberPage: false}})
               changePage();
-              execut();
             } else {
               alert('에러가 발생하여 로그아웃 되지 않았습니다.')
             }
           })
       }
-
-      // // 회원탈퇴 버튼
-      // withdraw.onclick = () => {
-      //   fetch(serverUrl + 'signup', {
-      //     method: 'DELETE',
-      //     mode: 'cors',
-      //     cache: 'no-cache',
-      //     headers: {
-      //       'Content-Type': 'application/json'
-      //     },
-      //     body: JSON.stringify()
-      //   })
-      //     .then(response => {
-      //       if (response.status === 200) {
-      //         document.getElementsByClassName('main')[0].removeChild(formNode)
-      //         chrome.storage.local.set({status: {signinPage: true, signupPage: false, memberPage: false}})
-      //         changePage();
-      //         execut();            
-      //       } else {
-      //         alert('에러가 발생하여 회원 탈퇴가 되지 않았습니다.')
-      //       }
-      //     })   
-      // }
     }  
   })
+
+  chrome.tabs.executeScript(null, {
+    file: 'content_script.js'
+  });
 }
 
 changePage();
 
-function execut() {
-  // executeScript를 여러번 실행시키기 위해 함수 작성.
-  chrome.tabs.executeScript(null, {
-    file: 'content_script.js'
-  });
-};
-
-execut();
+chrome.tabs.executeScript(null, {
+  file: 'content_script.js'
+});
