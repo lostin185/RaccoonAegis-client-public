@@ -393,8 +393,9 @@ function changePage() {
         })
           .then(response => {
             if (response.status === 200) {
-              alert('정상적으로 추가되었습니다.')
+              // alert('정상적으로 추가되었습니다.')
               document.getElementsByClassName('main')[0].removeChild(formNode)
+              chrome.storage.local.set({status: {signinPage: false, signupPage: false, memberPage: true}})
               changePage();
             } else {
               alert('에러가 발생하여 추가되지 않았습니다.')
